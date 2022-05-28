@@ -9,6 +9,7 @@ import { Route } from 'react-router-dom';
 import { history } from './configureStore';
 import { useDispatch } from 'react-redux';
 import { kakaoLoginDB } from './login';
+import { useSelector } from 'react-redux';
 
 const socket = io.connect('http://3.34.98.41', { path: '/socket.io' });
 
@@ -17,6 +18,15 @@ function App() {
   const [room, setRoom] = useState('');
   const [join, setJoin] = useState('');
   const [showChat, setShowChat] = useState(false);
+
+  const isLogin = useSelector((state) => state.login.isLogin);
+  const userInfo = useSelector((state) => state.login.userInfo);
+  React.useEffect(() => {
+    if (isLogin) {
+      setUsername(userInfo.userName);
+      setRoom(userInfo.userId);
+    }
+  }, []);
 
   const joinRoom = () => {
     if (username !== '' && room !== '') {
@@ -35,14 +45,6 @@ function App() {
   const REST_API_KEY = 'ebb64769e9ae562700e77df6554c840d';
   const REDIRECT_URI = 'http://localhost:3001/oauth/kakao/callback';
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-
-  // const dispatch = useDispatch();
-
-  // let code = new URL(window.location.href).searchParams.get('code');
-
-  // React.useEffect(async () => {
-  //   await dispatch(kakaoLoginDB(code));
-  // }, []);
 
   return (
     <ConnectedRouter history={history}>
@@ -75,7 +77,7 @@ function App() {
                 setRoom(event.target.value);
               }}
             />
-            <button onClick={joinRoom}>방 입장</button>
+            <button onClick={joinRoom}>메세지 보내기</button>
           </div>
         ) : (
           <Chat
